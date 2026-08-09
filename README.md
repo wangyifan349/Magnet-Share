@@ -218,9 +218,16 @@ Run these commands in order:
 ```bash
 git clone https://github.com/wangyifan349/Magnet-Share
 cd Magnet-Share
-pip install fastapi uvicorn pydantic
-python magnet_share_single_file.en.py
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python magnet_share.en.py    # English interface
 ```
+
+For the Chinese interface, run `python magnet_share.zh.py` instead.
+
+> **Note**: both files are self-contained single-file apps with their own embedded frontend —
+> run whichever language you prefer.
 
 Then open:
 
@@ -233,6 +240,24 @@ The application automatically creates the SQLite database in the current directo
 ```text
 magnet_share.db
 ```
+
+---
+
+## 🧪 Development and Testing
+
+```bash
+pip install -r requirements.txt
+pip install -e ".[dev]"     # installs pytest + httpx
+python -m pytest tests/ -v
+```
+
+The test suite runs the same scenarios against **both** the English
+(`magnet_share.en.py`) and Chinese (`magnet_share.zh.py`) variants:
+
+- health endpoint, registration, login, session (`/api/auth/*`)
+- magnet creation, duplicate detection, delete ownership rules
+- fuzzy search (LCS) and public user profiles
+- infohash parsing (hex + Base32) and input-length validation
 
 ---
 

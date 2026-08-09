@@ -230,16 +230,21 @@ class RegisterRequest(BaseModel):
 
     @field_validator("username")
     @classmethod
-    def username_must_not_be_empty(cls, username: str):
-        if not username.strip():
+    def validate_username(cls, username: str):
+        username = username.strip()
+        if not username:
             raise ValueError("用户名不能为空")
-        return username.strip()
+        if len(username) > 32:
+            raise ValueError("用户名不能超过 32 个字符")
+        return username
 
     @field_validator("password")
     @classmethod
-    def password_must_not_be_empty(cls, password: str):
-        if password == "":
-            raise ValueError("密码不能为空")
+    def validate_password(cls, password: str):
+        if len(password) < 6:
+            raise ValueError("密码至少需要 6 个字符")
+        if len(password) > 128:
+            raise ValueError("密码不能超过 128 个字符")
         return password
 
 
@@ -255,15 +260,21 @@ class MagnetRequest(BaseModel):
 
     @field_validator("title")
     @classmethod
-    def title_must_not_be_empty(cls, title: str):
-        if not title.strip():
+    def validate_title(cls, title: str):
+        title = title.strip()
+        if not title:
             raise ValueError("标题不能为空")
-        return title.strip()
+        if len(title) > 200:
+            raise ValueError("标题不能超过 200 个字符")
+        return title
 
     @field_validator("description")
     @classmethod
-    def trim_description(cls, description: str):
-        return description.strip()
+    def validate_description(cls, description: str):
+        description = description.strip()
+        if len(description) > 2000:
+            raise ValueError("描述不能超过 2000 个字符")
+        return description
 
     @field_validator("magnet")
     @classmethod
@@ -1635,12 +1646,22 @@ def search(
 
 initialize_database()
 
+health_router = APIRouter(tags=["Health"])
+
+
+@health_router.get("/api/health")
+def health_check():
+    """Lightweight health probe for load balancers and uptime monitors."""
+    return {"status": "ok"}
+
+
 app = FastAPI(
-    title="Magnet Share",
-    version="1.0.0",
-    description="Single-file FastAPI + SQLite magnet index.",
+    title="Magnet Share API",
+    version="1.0.1",
+    description="Single-file FastAPI + SQLite magnet index and search.",
 )
 
+app.include_router(health_router)
 app.include_router(page_router)
 app.include_router(auth_router)
 app.include_router(magnet_router)
