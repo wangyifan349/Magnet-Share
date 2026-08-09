@@ -28,11 +28,26 @@ https://github.com/wangyifan349/Magnet-Share
 - 🔴 User search results are marked in red
 - 🟢 Magnet search results are marked in green
 - 🌐 Every user has a public profile showing all magnets they created
+- 📤 Export all unique Magnet URIs to a plain-text file with one click
 
 Magnet URIs can be opened with BitTorrent clients such as:
 
 - [qBittorrent](https://www.qbittorrent.org/)
 - [qBittorrent Download](https://www.qbittorrent.org/download)
+
+---
+
+## 📤 Export All Magnets
+
+The navigation bar includes an **Export TXT** button. It downloads all Magnet URIs currently stored by the site as a plain-text file named:
+
+```text
+magnet-share-all.txt
+```
+
+The exported file contains only Magnet URIs, one per line. Titles, descriptions, usernames, timestamps, and other metadata are not included.
+
+Entries are de-duplicated by BTIH / Infohash, so the same BitTorrent content is exported only once even if multiple users submitted it or the Magnet URI contains different optional parameters.
 
 ---
 
@@ -219,7 +234,7 @@ Run these commands in order:
 git clone https://github.com/wangyifan349/Magnet-Share
 cd Magnet-Share
 pip install fastapi uvicorn pydantic
-python magnet_share_single_file.en.py
+python magnet_share.en.py
 ```
 
 Then open:

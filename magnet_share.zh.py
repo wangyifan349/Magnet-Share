@@ -14,6 +14,7 @@ Notes:
   For a public production service, use Argon2id/scrypt/bcrypt instead.
 """
 
+import base64
 import hashlib
 import re
 import secrets
@@ -24,7 +25,7 @@ from urllib.parse import parse_qs, urlparse
 
 import uvicorn
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, field_validator
 
 
@@ -106,6 +107,19 @@ def initialize_database():
 
 def sha512_text(value: str) -> str:
     return hashlib.sha512(value.encode("utf-8")).hexdigest()
+
+
+def canonical_infohash(infohash: str) -> str:
+    """将 BTIH 统一转换为小写十六进制，用于可靠去重。"""
+    infohash = infohash.strip()
+
+    if re.fullmatch(r"[0-9a-fA-F]{40}", infohash):
+        return infohash.lower()
+
+    if re.fullmatch(r"[A-Z2-7a-z]{32}", infohash):
+        return base64.b32decode(infohash.upper()).hex()
+
+    return infohash.casefold()
 
 
 def extract_infohash(magnet_link: str) -> str:
@@ -489,6 +503,15 @@ async function renderNavigation() {
     const homeLink = createTextElement("a", "搜索", "btn btn-outline-primary btn-sm");
     homeLink.href = "/";
     navigation.appendChild(homeLink);
+
+    const exportLink = createTextElement(
+        "a",
+        "导出 TXT",
+        "btn btn-outline-primary btn-sm"
+    );
+    exportLink.href = "/api/export/magnets";
+    exportLink.download = "magnet-share-all.txt";
+    navigation.appendChild(exportLink);
 
     if (!currentUser) {
         const loginLink = createTextElement("a", "登录", "btn btn-outline-primary btn-sm");
@@ -1513,6 +1536,53 @@ def get_user_magnets(
 
 
 # -----------------------------
+# 导出 API 路由
+# -----------------------------
+
+export_router = APIRouter(prefix="/api/export", tags=["导出"])
+
+
+@export_router.get("/magnets", response_class=PlainTextResponse)
+def export_all_magnets(
+    database: sqlite3.Connection = Depends(get_database),
+):
+    """将数据库中的全部磁力链按 BTIH 去重后导出为纯文本文件。"""
+    magnet_rows = database.execute(
+        """
+        SELECT id, magnet, infohash
+        FROM magnets
+        ORDER BY id ASC
+        """
+    ).fetchall()
+
+    exported_magnets = []
+    seen_infohashes = set()
+
+    for magnet_row in magnet_rows:
+        normalized_infohash = canonical_infohash(magnet_row["infohash"])
+
+        if normalized_infohash in seen_infohashes:
+            continue
+
+        seen_infohashes.add(normalized_infohash)
+        exported_magnets.append(magnet_row["magnet"].strip())
+
+    file_content = "\n".join(exported_magnets)
+
+    if file_content:
+        file_content += "\n"
+
+    return PlainTextResponse(
+        content=file_content,
+        media_type="text/plain; charset=utf-8",
+        headers={
+            "Content-Disposition":
+                'attachment; filename="magnet-share-all.txt"'
+        },
+    )
+
+
+# -----------------------------
 # Search API route
 # -----------------------------
 
@@ -1645,11 +1715,12 @@ app.include_router(page_router)
 app.include_router(auth_router)
 app.include_router(magnet_router)
 app.include_router(user_router)
+app.include_router(export_router)
 app.include_router(search_router)
 
 
 if __name__ == "__main__":
-    print('❤️ 如果这个项目对你有帮助，欢迎赞助支持项目维护与持续开发。')
+    print('❤️ 如果你觉得这个项目有帮助，或认同 BitTorrent / Magnet 等开放与 P2P 技术理念，欢迎自愿赞助作者。')
     print('₿ Bitcoin (BTC): bc1qxqfhumpqtnxrznkx9r4xsp8m6zsedtgusjns7p')
     print('Ł Litecoin (LTC): ltc1qx60jqksl8pa38zmqjxau0vy04rqpjgfpn0xgw3')
     print('◆ Ethereum (ETH): 0x2d92f9e4d8ac7effa9cd7cd5eccd364cac7c201b')
