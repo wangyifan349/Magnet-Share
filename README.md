@@ -219,7 +219,7 @@ Run these commands in order:
 git clone https://github.com/wangyifan349/Magnet-Share
 cd Magnet-Share
 pip install fastapi uvicorn pydantic
-python magnet_share_single_file.py
+python magnet_share_single_file.en.py
 ```
 
 Then open:
