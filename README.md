@@ -9,7 +9,7 @@ Users can create accounts, manage their own magnet lists, remove entries they cr
 🔗 Repository:
 
 ```text
-https://github.com/wangyifan349/magnet-share
+https://github.com/wangyifan349/Magnet-Share
 ```
 
 ---
@@ -216,8 +216,8 @@ Requires Python 3.10+.
 Run these commands in order:
 
 ```bash
-git clone https://github.com/wangyifan349/magnet-share
-cd magnet-share
+git clone https://github.com/wangyifan349/Magnet-Share
+cd Magnet-Share
 pip install fastapi uvicorn pydantic
 python magnet_share_single_file.py
 ```
@@ -225,7 +225,7 @@ python magnet_share_single_file.py
 Then open:
 
 ```text
-http://127.0.0.1:8000
+http://0.0.0.0:8000
 ```
 
 The application automatically creates the SQLite database in the current directory:
