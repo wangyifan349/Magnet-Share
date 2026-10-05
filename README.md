@@ -262,7 +262,7 @@ Sponsorship is simply a way to show appreciation for the project and the ideas b
 ### ₿ Bitcoin (BTC)
 
 ```text
-bc1qxqfhumpqtnxrznkx9r4xsp8m6zsedtgusjns7p
+bc1qwhzzk5tx07592vkf97rt8x8v0zdntad8lexnrgv3gdmecg8pfmhqzceedl
 ```
 
 ### Ł Litecoin (LTC)

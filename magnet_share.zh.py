@@ -1721,7 +1721,7 @@ app.include_router(search_router)
 
 if __name__ == "__main__":
     print('❤️ 如果你觉得这个项目有帮助，或认同 BitTorrent / Magnet 等开放与 P2P 技术理念，欢迎自愿赞助作者。')
-    print('₿ Bitcoin (BTC): bc1qxqfhumpqtnxrznkx9r4xsp8m6zsedtgusjns7p')
+    print('₿ Bitcoin (BTC): bc1qwhzzk5tx07592vkf97rt8x8v0zdntad8lexnrgv3gdmecg8pfmhqzceedl')
     print('Ł Litecoin (LTC): ltc1qx60jqksl8pa38zmqjxau0vy04rqpjgfpn0xgw3')
     print('◆ Ethereum (ETH): 0x2d92f9e4d8ac7effa9cd7cd5eccd364cac7c201b')
     print()
